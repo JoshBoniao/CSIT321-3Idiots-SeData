@@ -20,7 +20,7 @@ import com.csit321g3._idiots.sedata.service.CourseService;
 
 @RestController
 @RequestMapping("/course")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CourseController {
 
     @Autowired

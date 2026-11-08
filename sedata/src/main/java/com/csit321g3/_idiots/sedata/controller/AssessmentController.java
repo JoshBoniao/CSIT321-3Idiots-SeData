@@ -20,7 +20,7 @@ import com.csit321g3._idiots.sedata.service.AssessmentService;
 
 @RestController
 @RequestMapping("/assessment")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AssessmentController {
 
     @Autowired

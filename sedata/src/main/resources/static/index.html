@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeData - Academic Management System</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const API_BASE = window.location.origin.includes('localhost:8080')
+      ? ''
+      : 'http://localhost:8080';
+
+    // SVG Icons
+    const Icons = {
+      BookOpen: () => (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+      Clipboard: () => (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      ),
+      Plus: () => (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+        </svg>
+      ),
+      Trash: () => (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+      Edit: () => (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      ),
+      Refresh: () => (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      ),
+      Check: () => (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+        </svg>
+      ),
+      Server: () => (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+        </svg>
+      )
+    };
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('courses');
+      const [courses, setCourses] = useState([]);
+      const [assessments, setAssessments] = useState([]);
+      const [backendOnline, setBackendOnline] = useState(false);
+      const [loading, setLoading] = useState(true);
+      const [toast, setToast] = useState(null);
+
+      // Course Form State
+      const [courseForm, setCourseForm] = useState({ course_name: '', instructor_id: '' });
+      const [editingCourseId, setEditingCourseId] = useState(null);
+      const [showCourseModal, setShowCourseModal] = useState(false);
+
+      // Assessment Form State
+      const [assessmentForm, setAssessmentForm] = useState({ title: '', course_id: '', retention_days: 30 });
+      const [editingAssessmentId, setEditingAssessmentId] = useState(null);
+      const [showAssessmentModal, setShowAssessmentModal] = useState(false);
+
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3500);
+      };
+
+      // Fetch Data
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const [resCourses, resAssessments] = await Promise.all([
+            fetch(`${API_BASE}/course`),
+            fetch(`${API_BASE}/assessment`)
+          ]);
+
+          if (resCourses.ok && resAssessments.ok) {
+            const dataCourses = await resCourses.json();
+            const dataAssessments = await resAssessments.json();
+            setCourses(dataCourses);
+            setAssessments(dataAssessments);
+            setBackendOnline(true);
+          } else {
+            setBackendOnline(false);
+          }
+        } catch (err) {
+          setBackendOnline(false);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchData();
+      }, []);
+
+      // Course Handlers
+      const handleSaveCourse = async (e) => {
+        e.preventDefault();
+        if (!courseForm.course_name.trim()) return;
+
+        const payload = {
+          course_name: courseForm.course_name,
+          instructor_id: parseInt(courseForm.instructor_id) || 1
+        };
+
+        try {
+          if (editingCourseId) {
+            const res = await fetch(`${API_BASE}/course/${editingCourseId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+              showToast('Course updated successfully');
+              fetchData();
+              setEditingCourseId(null);
+              setShowCourseModal(false);
+            }
+          } else {
+            const res = await fetch(`${API_BASE}/course`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+              showToast('Course created successfully');
+              fetchData();
+              setShowCourseModal(false);
+            }
+          }
+          setCourseForm({ course_name: '', instructor_id: '' });
+        } catch (err) {
+          showToast('Failed to save course. Ensure backend is running.', 'error');
+        }
+      };
+
+      const handleDeleteCourse = async (id) => {
+        if (!confirm('Are you sure you want to delete this course?')) return;
+        try {
+          const res = await fetch(`${API_BASE}/course/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            showToast('Course deleted');
+            fetchData();
+          }
+        } catch (err) {
+          showToast('Failed to delete course', 'error');
+        }
+      };
+
+      // Assessment Handlers
+      const handleSaveAssessment = async (e) => {
+        e.preventDefault();
+        if (!assessmentForm.title.trim()) return;
+
+        const payload = {
+          title: assessmentForm.title,
+          retention_days: parseInt(assessmentForm.retention_days) || 30,
+          course_id: parseInt(assessmentForm.course_id) || 0
+        };
+
+        try {
+          if (editingAssessmentId) {
+            const res = await fetch(`${API_BASE}/assessment/${editingAssessmentId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+              showToast('Assessment updated successfully');
+              fetchData();
+              setEditingAssessmentId(null);
+              setShowAssessmentModal(false);
+            }
+          } else {
+            const res = await fetch(`${API_BASE}/assessment`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+              showToast('Assessment created successfully');
+              fetchData();
+              setShowAssessmentModal(false);
+            }
+          }
+          setAssessmentForm({ title: '', course_id: '', retention_days: 30 });
+        } catch (err) {
+          showToast('Failed to save assessment. Ensure backend is running.', 'error');
+        }
+      };
+
+      const handleDeleteAssessment = async (id) => {
+        if (!confirm('Are you sure you want to delete this assessment?')) return;
+        try {
+          const res = await fetch(`${API_BASE}/assessment/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            showToast('Assessment deleted');
+            fetchData();
+          }
+        } catch (err) {
+          showToast('Failed to delete assessment', 'error');
+        }
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col font-sans">
+          {/* Header */}
+          <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                  S
+                </div>
+                <div>
+                  <h1 className="text-base font-semibold text-slate-900 tracking-tight leading-tight">SeData</h1>
+                  <p className="text-xs text-slate-500">Course & Assessment Portal</p>
+                </div>
+              </div>
+
+              {/* Status & Refresh */}
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className={`w-2.5 h-2.5 rounded-full ${backendOnline ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                  <span className="text-slate-600 font-medium">
+                    {backendOnline ? 'Backend Online (Port 8080)' : 'Backend Offline'}
+                  </span>
+                </div>
+                <button
+                  onClick={fetchData}
+                  className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition"
+                  title="Refresh data"
+                >
+                  <Icons.Refresh />
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Navigation Bar */}
+          <div className="bg-white border-b border-slate-200">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8">
+              <button
+                onClick={() => setActiveTab('courses')}
+                className={`py-3.5 text-sm font-medium border-b-2 flex items-center space-x-2 transition ${
+                  activeTab === 'courses'
+                    ? 'border-slate-900 text-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Icons.BookOpen />
+                <span>Courses</span>
+                <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600">
+                  {courses.length}
+                </span>
+              </button>
+              <button
+                onClick={() => setActiveTab('assessments')}
+                className={`py-3.5 text-sm font-medium border-b-2 flex items-center space-x-2 transition ${
+                  activeTab === 'assessments'
+                    ? 'border-slate-900 text-slate-900'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Icons.Clipboard />
+                <span>Assessments</span>
+                <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600">
+                  {assessments.length}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Offline Banner */}
+          {!backendOnline && (
+            <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-800 text-center">
+              ⚠️ The Spring Boot backend is not responding at <code className="font-mono bg-amber-100 px-1 py-0.5 rounded">http://localhost:8080</code>.
+              Make sure MySQL is started in XAMPP and run <code className="font-mono bg-amber-100 px-1 py-0.5 rounded">SedataApplication.java</code>.
+            </div>
+          )}
+
+          {/* Main Content */}
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+            {activeTab === 'courses' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900">Courses</h2>
+                    <p className="text-sm text-slate-500">Manage academic courses and assigned instructors</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingCourseId(null);
+                      setCourseForm({ course_name: '', instructor_id: '' });
+                      setShowCourseModal(true);
+                    }}
+                    className="inline-flex items-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition"
+                  >
+                    <Icons.Plus />
+                    <span>New Course</span>
+                  </button>
+                </div>
+
+                {/* Courses Table */}
+                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs uppercase tracking-wider">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold">Course ID</th>
+                        <th className="px-6 py-3 font-semibold">Course Name</th>
+                        <th className="px-6 py-3 font-semibold">Instructor ID</th>
+                        <th className="px-6 py-3 font-semibold text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {courses.length === 0 ? (
+                        <tr>
+                          <td colSpan="4" className="px-6 py-12 text-center text-slate-400">
+                            No courses found. Click <strong>"New Course"</strong> to create one.
+                          </td>
+                        </tr>
+                      ) : (
+                        courses.map((course) => (
+                          <tr key={course.course_id} className="hover:bg-slate-50/80 transition">
+                            <td className="px-6 py-4 font-mono text-xs font-semibold text-slate-700">
+                              #{course.course_id}
+                            </td>
+                            <td className="px-6 py-4 font-medium text-slate-900">
+                              {course.course_name}
+                            </td>
+                            <td className="px-6 py-4 text-slate-600">
+                              Instructor ID: <span className="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">{course.instructor_id}</span>
+                            </td>
+                            <td className="px-6 py-4 text-right space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingCourseId(course.course_id);
+                                  setCourseForm({
+                                    course_name: course.course_name,
+                                    instructor_id: course.instructor_id
+                                  });
+                                  setShowCourseModal(true);
+                                }}
+                                className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition"
+                                title="Edit course"
+                              >
+                                <Icons.Edit />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCourse(course.course_id)}
+                                className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded transition"
+                                title="Delete course"
+                              >
+                                <Icons.Trash />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'assessments' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900">Assessments</h2>
+                    <p className="text-sm text-slate-500">Manage assessments, course mappings, and data retention rules</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingAssessmentId(null);
+                      setAssessmentForm({
+                        title: '',
+                        course_id: courses[0]?.course_id || '',
+                        retention_days: 30
+                      });
+                      setShowAssessmentModal(true);
+                    }}
+                    className="inline-flex items-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition"
+                  >
+                    <Icons.Plus />
+                    <span>New Assessment</span>
+                  </button>
+                </div>
+
+                {/* Assessments Table */}
+                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs uppercase tracking-wider">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold">Assessment ID</th>
+                        <th className="px-6 py-3 font-semibold">Title</th>
+                        <th className="px-6 py-3 font-semibold">Course</th>
+                        <th className="px-6 py-3 font-semibold">Retention</th>
+                        <th className="px-6 py-3 font-semibold text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {assessments.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="px-6 py-12 text-center text-slate-400">
+                            No assessments found. Click <strong>"New Assessment"</strong> to add one.
+                          </td>
+                        </tr>
+                      ) : (
+                        assessments.map((item) => (
+                          <tr key={item.assessment_id} className="hover:bg-slate-50/80 transition">
+                            <td className="px-6 py-4 font-mono text-xs font-semibold text-slate-700">
+                              #{item.assessment_id}
+                            </td>
+                            <td className="px-6 py-4 font-medium text-slate-900">
+                              {item.title}
+                            </td>
+                            <td className="px-6 py-4 text-slate-600">
+                              {(() => {
+                                const matched = courses.find(c => c.course_id === (typeof item.course_id === 'object' ? item.course_id?.course_id : item.course_id));
+                                return matched ? (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sky-50 text-sky-700 border border-sky-100">
+                                    {matched.course_name} (ID: #{matched.course_id})
+                                  </span>
+                                ) : item.course_id ? (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                                    Course #{typeof item.course_id === 'object' ? item.course_id?.course_id : item.course_id}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-slate-400 italic">None assigned</span>
+                                );
+                              })()}
+                            </td>
+                            <td className="px-6 py-4 text-slate-600 text-xs">
+                              <span className="font-mono bg-slate-100 px-2 py-0.5 rounded">{item.retention_days} days</span>
+                            </td>
+                            <td className="px-6 py-4 text-right space-x-2">
+                              <button
+                                onClick={() => {
+                                  setEditingAssessmentId(item.assessment_id);
+                                  setAssessmentForm({
+                                    title: item.title,
+                                    course_id: typeof item.course_id === 'object' ? item.course_id?.course_id : (item.course_id || ''),
+                                    retention_days: item.retention_days
+                                  });
+                                  setShowAssessmentModal(true);
+                                }}
+                                className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition"
+                                title="Edit assessment"
+                              >
+                                <Icons.Edit />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteAssessment(item.assessment_id)}
+                                className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded transition"
+                                title="Delete assessment"
+                              >
+                                <Icons.Trash />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* Modal: Course */}
+          {showCourseModal && (
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">
+                  {editingCourseId ? 'Edit Course' : 'Create New Course'}
+                </h3>
+                <form onSubmit={handleSaveCourse} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Course Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Web Development"
+                      value={courseForm.course_name}
+                      onChange={(e) => setCourseForm({ ...courseForm, course_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Instructor ID
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="e.g. 101"
+                      value={courseForm.instructor_id}
+                      onChange={(e) => setCourseForm({ ...courseForm, instructor_id: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowCourseModal(false)}
+                      className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg shadow-sm transition"
+                    >
+                      {editingCourseId ? 'Save Changes' : 'Create Course'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Modal: Assessment */}
+          {showAssessmentModal && (
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">
+                  {editingAssessmentId ? 'Edit Assessment' : 'Create New Assessment'}
+                </h3>
+                <form onSubmit={handleSaveAssessment} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Midterm Examination"
+                      value={assessmentForm.title}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, title: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Associated Course
+                    </label>
+                    <select
+                      value={assessmentForm.course_id}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, course_id: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
+                    >
+                      <option value="">-- None / Select Course --</option>
+                      {courses.map((c) => (
+                        <option key={c.course_id} value={c.course_id}>
+                          #{c.course_id} - {c.course_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Retention Days
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="30"
+                      value={assessmentForm.retention_days}
+                      onChange={(e) => setAssessmentForm({ ...assessmentForm, retention_days: e.target.value })}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAssessmentModal(false)}
+                      className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg shadow-sm transition"
+                    >
+                      {editingAssessmentId ? 'Save Changes' : 'Create Assessment'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Toast Notification */}
+          {toast && (
+            <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg text-sm font-medium shadow-lg z-50 transition-all flex items-center space-x-2 ${
+              toast.type === 'error' ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white'
+            }`}>
+              <span>{toast.message}</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

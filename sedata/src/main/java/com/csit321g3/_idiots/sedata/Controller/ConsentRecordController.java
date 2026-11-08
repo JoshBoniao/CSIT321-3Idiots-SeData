@@ -1,4 +1,4 @@
-package com.csit321g3._idiots.sedata.controller;
+package com.csit321g3._idiots.sedata.controller;   
 
 import com.csit321g3._idiots.sedata.entity.ConsentRecord;
 import com.csit321g3._idiots.sedata.service.ConsentRecordService;
