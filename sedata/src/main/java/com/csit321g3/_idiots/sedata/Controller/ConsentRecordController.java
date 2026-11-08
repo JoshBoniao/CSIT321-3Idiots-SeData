@@ -1,7 +1,7 @@
-package com.csit321g3._idiots.sedata.Controller;
+package com.csit321g3._idiots.sedata.controller;
 
 import com.csit321g3._idiots.sedata.entity.ConsentRecord;
-import com.csit321g3._idiots.sedata.Service.ConsentRecordService;
+import com.csit321g3._idiots.sedata.service.ConsentRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

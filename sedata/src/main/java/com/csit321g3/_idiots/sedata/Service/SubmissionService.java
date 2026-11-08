@@ -1,7 +1,7 @@
-package com.csit321g3._idiots.sedata.Service;
+package com.csit321g3._idiots.sedata.service;
 
 import com.csit321g3._idiots.sedata.entity.Submission;
-import com.csit321g3._idiots.sedata.Repository.SubmissionRepository;
+import com.csit321g3._idiots.sedata.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

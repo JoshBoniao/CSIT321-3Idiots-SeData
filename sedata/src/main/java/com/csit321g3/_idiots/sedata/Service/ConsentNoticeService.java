@@ -1,7 +1,7 @@
-package com.csit321g3._idiots.sedata.Service;
+package com.csit321g3._idiots.sedata.service;
 
 import com.csit321g3._idiots.sedata.entity.ConsentNotice;
-import com.csit321g3._idiots.sedata.Repository.ConsentNoticeRepository;
+import com.csit321g3._idiots.sedata.repository.ConsentNoticeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

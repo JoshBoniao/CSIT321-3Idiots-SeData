@@ -1,4 +1,4 @@
-package com.csit321g3._idiots.sedata.Repository;
+package com.csit321g3._idiots.sedata.repository;
 
 import com.csit321g3._idiots.sedata.entity.Submission;
 import org.springframework.data.jpa.repository.JpaRepository;
