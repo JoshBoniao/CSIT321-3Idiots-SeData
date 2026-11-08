@@ -1,6 +1,6 @@
 package com.csit321g3._idiots.sedata.Service;
 
-import com.csit321g3._idiots.sedata.entity.consent_record;
+import com.csit321g3._idiots.sedata.entity.ConsentRecord;
 import com.csit321g3._idiots.sedata.Repository.ConsentRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class ConsentRecordService {
     private ConsentRecordRepository consentRecordRepository;
 
     // Create
-    public consent_record createConsentRecord(consent_record record) {
+    public ConsentRecord createConsentRecord(ConsentRecord record) {
         if (record.getDecided_at() == null) {
             record.setDecided_at(LocalDateTime.now());
         }
@@ -24,17 +24,17 @@ public class ConsentRecordService {
     }
 
     // Read All
-    public List<consent_record> getAllConsentRecords() {
+    public List<ConsentRecord> getAllConsentRecords() {
         return consentRecordRepository.findAll();
     }
 
     // Read by ID
-    public Optional<consent_record> getConsentRecordById(int id) {
+    public Optional<ConsentRecord> getConsentRecordById(int id) {
         return consentRecordRepository.findById(id);
     }
 
     // Update
-    public consent_record updateConsentRecord(int id, consent_record newRecord) {
+    public ConsentRecord updateConsentRecord(int id, ConsentRecord newRecord) {
         return consentRecordRepository.findById(id).map(existing -> {
             existing.setNotice_id(newRecord.getNotice_id());
             existing.setStudent_id(newRecord.getStudent_id());

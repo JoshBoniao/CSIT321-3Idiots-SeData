@@ -1,6 +1,6 @@
 package com.csit321g3._idiots.sedata.Controller;
 
-import com.csit321g3._idiots.sedata.entity.consent_notice;
+import com.csit321g3._idiots.sedata.entity.ConsentNotice;
 import com.csit321g3._idiots.sedata.Service.ConsentNoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,20 +19,20 @@ public class ConsentNoticeController {
 
     // Create
     @PostMapping({"", "/add"})
-    public ResponseEntity<consent_notice> createConsentNotice(@RequestBody consent_notice notice) {
-        consent_notice created = consentNoticeService.createConsentNotice(notice);
+    public ResponseEntity<ConsentNotice> createConsentNotice(@RequestBody ConsentNotice notice) {
+        ConsentNotice created = consentNoticeService.createConsentNotice(notice);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     // Read All
     @GetMapping({"", "/all"})
-    public List<consent_notice> getAllConsentNotices() {
+    public List<ConsentNotice> getAllConsentNotices() {
         return consentNoticeService.getAllConsentNotices();
     }
 
     // Read by ID
     @GetMapping("/{id}")
-    public ResponseEntity<consent_notice> getConsentNoticeById(@PathVariable int id) {
+    public ResponseEntity<ConsentNotice> getConsentNoticeById(@PathVariable int id) {
         return consentNoticeService.getConsentNoticeById(id)
                 .map(notice -> new ResponseEntity<>(notice, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -40,8 +40,8 @@ public class ConsentNoticeController {
 
     // Update
     @PutMapping({"/{id}", "/update/{id}"})
-    public ResponseEntity<consent_notice> updateConsentNotice(@PathVariable int id, @RequestBody consent_notice notice) {
-        consent_notice updated = consentNoticeService.updateConsentNotice(id, notice);
+    public ResponseEntity<ConsentNotice> updateConsentNotice(@PathVariable int id, @RequestBody ConsentNotice notice) {
+        ConsentNotice updated = consentNoticeService.updateConsentNotice(id, notice);
         if (updated != null) {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         }
