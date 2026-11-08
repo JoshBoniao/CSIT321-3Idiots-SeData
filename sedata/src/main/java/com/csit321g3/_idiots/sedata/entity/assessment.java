@@ -14,16 +14,11 @@ public class Assessment {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int assessment_id;
-
-    @ManyToOne
-    @JoinColumn(name = "course_id")
     private Course course_id;
-
     private int retention_days;
     private String title;
 
     public Assessment(){}
-
     public Assessment(int assessment_id, Course course_id, int retention_days, String title) {
         this.assessment_id = assessment_id;
         this.course_id = course_id;
