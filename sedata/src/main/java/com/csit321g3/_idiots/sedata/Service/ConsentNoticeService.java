@@ -1,6 +1,6 @@
 package com.csit321g3._idiots.sedata.Service;
 
-import com.csit321g3._idiots.sedata.entity.consent_notice;
+import com.csit321g3._idiots.sedata.entity.ConsentNotice;
 import com.csit321g3._idiots.sedata.Repository.ConsentNoticeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class ConsentNoticeService {
     private ConsentNoticeRepository consentNoticeRepository;
 
     // Create
-    public consent_notice createConsentNotice(consent_notice notice) {
+    public ConsentNotice createConsentNotice(ConsentNotice notice) {
         if (notice.getCreated_at() == null) {
             notice.setCreated_at(LocalDateTime.now());
         }
@@ -24,17 +24,17 @@ public class ConsentNoticeService {
     }
 
     // Read All
-    public List<consent_notice> getAllConsentNotices() {
+    public List<ConsentNotice> getAllConsentNotices() {
         return consentNoticeRepository.findAll();
     }
 
     // Read by ID
-    public Optional<consent_notice> getConsentNoticeById(int id) {
+    public Optional<ConsentNotice> getConsentNoticeById(int id) {
         return consentNoticeRepository.findById(id);
     }
 
     // Update
-    public consent_notice updateConsentNotice(int id, consent_notice newNotice) {
+    public ConsentNotice updateConsentNotice(int id, ConsentNotice newNotice) {
         return consentNoticeRepository.findById(id).map(existing -> {
             existing.setAssessment_id(newNotice.getAssessment_id());
             existing.setData_collected(newNotice.getData_collected());

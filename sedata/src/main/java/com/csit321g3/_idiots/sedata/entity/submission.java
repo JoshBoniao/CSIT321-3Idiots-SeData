@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tblsubmission")
-public class submission {
+public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int submission_id;
@@ -22,10 +22,10 @@ public class submission {
     private byte[] encrypted_data;
     private LocalDateTime submitted_at;
 
-    public submission() {
+    public Submission() {
     }
 
-    public submission(int submission_id, int assessment_id, int student_id, int consent_id, byte[] encrypted_data, LocalDateTime submitted_at) {
+    public Submission(int submission_id, int assessment_id, int student_id, int consent_id, byte[] encrypted_data, LocalDateTime submitted_at) {
         this.submission_id = submission_id;
         this.assessment_id = assessment_id;
         this.student_id = student_id;
