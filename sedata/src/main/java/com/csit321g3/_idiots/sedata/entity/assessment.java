@@ -12,28 +12,28 @@ public class Assessment {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int assessment_id;
-    private int course_id;
+    private Course course_id;
     private int retention_days;
     private String title;
 
     public Assessment(){}
-    public Assessment(int assessment_id, int course_id, int retention_days, String title) {
+    public Assessment(int assessment_id, Course course_id, int retention_days, String title) {
         this.assessment_id = assessment_id;
         this.course_id = course_id;
         this.retention_days = retention_days;
         this.title = title;
     }
     
-    public int getassessment_id() {
+    public int getAssessment_id() {
         return assessment_id;
     }
-    public void setassessment_id(int assessment_id) {
+    public void setAssessment_id(int assessment_id) {
         this.assessment_id = assessment_id;
     }
-    public int getCourse_id() {
+    public Course getCourse_id() {
         return course_id;
     }
-    public void setCourse_id(int course_id) {
+    public void setCourse_id(Course course_id) {
         this.course_id = course_id;
     }
     public int getRetention_days() {
