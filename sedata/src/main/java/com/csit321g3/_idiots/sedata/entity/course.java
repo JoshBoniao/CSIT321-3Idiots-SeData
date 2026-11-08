@@ -8,15 +8,15 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tblcourse")
-public class course {
+public class Course {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int course_id;
     private int instructor_id;
     private String course_name;
 
-    public course(){}
-    public course(int course_id, int instructor_id, String course_name) {
+    public Course(){}
+    public Course(int course_id, int instructor_id, String course_name) {
         this.course_id = course_id;
         this.instructor_id = instructor_id;
         this.course_name = course_name;
