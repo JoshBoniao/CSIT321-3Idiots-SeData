@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tblauditlog")
-public class auditLog {
+public class AuditLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +18,10 @@ public class auditLog {
     private String target;
     private String loggedAt;
 
-    public auditLog() {
+    public AuditLog() {
     }
 
-    public auditLog(int logId, int userId, String action, String target, String loggedAt) {
+    public AuditLog(int logId, int userId, String action, String target, String loggedAt) {
         this.logId = logId;
         this.userId = userId;
         this.action = action;

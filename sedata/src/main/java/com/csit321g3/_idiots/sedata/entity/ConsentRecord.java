@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tblconsent_record")
-public class consent_record {
+public class ConsentRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int consent_id;
@@ -18,10 +18,10 @@ public class consent_record {
     private String decision;
     private LocalDateTime decided_at;
 
-    public consent_record() {
+    public ConsentRecord() {
     }
 
-    public consent_record(int consent_id, int notice_id, int student_id, String decision, LocalDateTime decided_at) {
+    public ConsentRecord(int consent_id, int notice_id, int student_id, String decision, LocalDateTime decided_at) {
         this.consent_id = consent_id;
         this.notice_id = notice_id;
         this.student_id = student_id;
