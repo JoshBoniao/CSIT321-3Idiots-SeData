@@ -1,6 +1,6 @@
 package com.csit321g3._idiots.sedata.Service;
 
-import com.csit321g3._idiots.sedata.entity.submission;
+import com.csit321g3._idiots.sedata.entity.Submission;
 import com.csit321g3._idiots.sedata.Repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class SubmissionService {
     private SubmissionRepository submissionRepository;
 
     // Create
-    public submission createSubmission(submission sub) {
+    public Submission createSubmission(Submission sub) {
         if (sub.getSubmitted_at() == null) {
             sub.setSubmitted_at(LocalDateTime.now());
         }
@@ -24,17 +24,17 @@ public class SubmissionService {
     }
 
     // Read All
-    public List<submission> getAllSubmissions() {
+    public List<Submission> getAllSubmissions() {
         return submissionRepository.findAll();
     }
 
     // Read by ID
-    public Optional<submission> getSubmissionById(int id) {
+    public Optional<Submission> getSubmissionById(int id) {
         return submissionRepository.findById(id);
     }
 
     // Update
-    public submission updateSubmission(int id, submission newSub) {
+    public Submission updateSubmission(int id, Submission newSub) {
         return submissionRepository.findById(id).map(existing -> {
             existing.setAssessment_id(newSub.getAssessment_id());
             existing.setStudent_id(newSub.getStudent_id());

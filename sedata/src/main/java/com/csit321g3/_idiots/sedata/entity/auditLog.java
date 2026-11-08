@@ -1,5 +1,7 @@
 package com.csit321g3._idiots.sedata.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,37 +14,45 @@ public class AuditLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int logId;
-    private int userId;
+    private int log_id;
+    private int user_id;
     private String action;
     private String target;
-    private String loggedAt;
+    private LocalDateTime logged_at;
 
     public AuditLog() {
     }
 
-    public AuditLog(int logId, int userId, String action, String target, String loggedAt) {
-        this.logId = logId;
-        this.userId = userId;
+    public AuditLog(int user_id, String action, String target, LocalDateTime logged_at) {
+        this.user_id = user_id;
         this.action = action;
         this.target = target;
-        this.loggedAt = loggedAt;
+        this.logged_at = logged_at;
     }
 
-    public int getLogId() {
-        return logId;
+    public AuditLog(int log_id, int user_id, String action, String target, LocalDateTime logged_at) {
+        this.log_id = log_id;
+        this.user_id = user_id;
+        this.action = action;
+        this.target = target;
+        this.logged_at = logged_at;
     }
 
-    public void setLogId(int logId) {
-        this.logId = logId;
+    // Standard snake_case getters and setters matching ERD
+    public int getLog_id() {
+        return log_id;
     }
 
-    public int getUserId() {
-        return userId;
+    public void setLog_id(int log_id) {
+        this.log_id = log_id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
     public String getAction() {
@@ -61,12 +71,36 @@ public class AuditLog {
         this.target = target;
     }
 
-    public String getLoggedAt() {
-        return loggedAt;
+    public LocalDateTime getLogged_at() {
+        return logged_at;
     }
 
-    public void setLoggedAt(String loggedAt) {
-        this.loggedAt = loggedAt;
+    public void setLogged_at(LocalDateTime logged_at) {
+        this.logged_at = logged_at;
     }
-    
+
+    // CamelCase alias getters and setters for backward-compatibility
+    public int getLogId() {
+        return log_id;
+    }
+
+    public void setLogId(int logId) {
+        this.log_id = logId;
+    }
+
+    public int getUserId() {
+        return user_id;
+    }
+
+    public void setUserId(int userId) {
+        this.user_id = userId;
+    }
+
+    public LocalDateTime getLoggedAt() {
+        return logged_at;
+    }
+
+    public void setLoggedAt(LocalDateTime loggedAt) {
+        this.logged_at = loggedAt;
+    }
 }
