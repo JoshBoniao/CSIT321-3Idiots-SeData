@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -14,12 +12,12 @@ public class Assessment {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int assessment_id;
-    private Course course_id;
+    private int course_id;
     private int retention_days;
     private String title;
 
     public Assessment(){}
-    public Assessment(int assessment_id, Course course_id, int retention_days, String title) {
+    public Assessment(int assessment_id, int course_id, int retention_days, String title) {
         this.assessment_id = assessment_id;
         this.course_id = course_id;
         this.retention_days = retention_days;
@@ -34,19 +32,19 @@ public class Assessment {
         this.assessment_id = assessment_id;
     }
 
-    public Course getCourse_id() {
+    public int getCourse_id() {
         return course_id;
     }
 
-    public void setCourse_id(Course course_id) {
+    public void setCourse_id(int course_id) {
         this.course_id = course_id;
     }
 
-    public Course getCourse() {
+    public int getCourse() {
         return course_id;
     }
 
-    public void setCourse(Course course) {
+    public void setCourse(int course) {
         this.course_id = course;
     }
 
