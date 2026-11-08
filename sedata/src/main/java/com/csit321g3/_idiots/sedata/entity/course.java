@@ -40,4 +40,5 @@ public class Course {
     public void setCourse_name(String course_name) {
         this.course_name = course_name;
     }
+    
 }
